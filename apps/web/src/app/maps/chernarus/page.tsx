@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Container from "@/components/ui/Container";
-import MapPlaceholder from "@/components/MapPlaceholder";
+import MapLoader from "@/components/map/MapLoader";
 
 export const metadata: Metadata = {
   title: "Chernarus Interactive Map",
@@ -23,41 +23,7 @@ export default function ChernarusPage() {
           </p>
         </div>
 
-        <div
-          className="mb-3 flex flex-wrap items-center gap-2 rounded-sm border border-zinc-800 bg-zinc-900 px-4 py-3"
-          role="toolbar"
-          aria-label="Map controls — coming in the next milestone"
-        >
-          <span className="mr-2 text-xs font-medium uppercase tracking-wider text-zinc-600">
-            Next milestone:
-          </span>
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            className="cursor-not-allowed rounded-sm border border-zinc-800 px-3 py-1.5 text-xs text-zinc-600"
-          >
-            Search locations
-          </button>
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            className="cursor-not-allowed rounded-sm border border-zinc-800 px-3 py-1.5 text-xs text-zinc-600"
-          >
-            Filters
-          </button>
-          <button
-            type="button"
-            disabled
-            aria-disabled="true"
-            className="cursor-not-allowed rounded-sm border border-zinc-800 px-3 py-1.5 text-xs text-zinc-600"
-          >
-            Map layers
-          </button>
-        </div>
-
-        <MapPlaceholder />
+        <MapLoader mapSlug="chernarus" />
       </Container>
     </div>
   );

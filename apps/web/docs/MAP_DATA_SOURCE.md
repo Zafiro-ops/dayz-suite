@@ -42,3 +42,9 @@ The project owner must:
 4. Document the chosen license and link to the agreement in this file
 
 **Do not integrate any tile assets until the above steps are completed and documented.**
+
+---
+
+See `MAP_ENGINE_ARCHITECTURE.md` for the Milestone 3B engine design, fictional
+demo data strategy, and the coordinate model that will adapt to real tiles once
+the asset question is resolved.
