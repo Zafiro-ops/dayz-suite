@@ -9,6 +9,7 @@ import NeutralMapBackground from "./NeutralMapBackground";
 import ClusterLayer from "./ClusterLayer";
 import RouteMapLayer from "./RouteMapLayer";
 import RouteClickHandler from "./RouteClickHandler";
+import FitRouteHandler from "./FitRouteHandler";
 import { normalizedToLeaflet } from "@/lib/map-engine/coordinates";
 
 interface MapViewportProps {
@@ -55,6 +56,7 @@ export default function MapViewport({
       />
       <RouteMapLayer bounds={config.bounds} />
       <RouteClickHandler bounds={config.bounds} />
+      <FitRouteHandler bounds={config.bounds} />
     </MapContainer>
   );
 }

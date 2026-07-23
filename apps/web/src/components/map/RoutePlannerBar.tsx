@@ -3,8 +3,15 @@
 import { useRoutePlannerContext } from "@/lib/map-engine/route-context";
 
 export default function RoutePlannerBar() {
-  const { points, totalDistance, undoLastPoint, clearRoute, exitRoute } =
-    useRoutePlannerContext();
+  const {
+    points,
+    totalDistance,
+    undoLastPoint,
+    reverseRoute,
+    triggerFitRoute,
+    clearRoute,
+    exitRoute,
+  } = useRoutePlannerContext();
 
   const hasPoints = points.length > 0;
 
@@ -67,6 +74,26 @@ export default function RoutePlannerBar() {
           className="rounded-sm border border-zinc-700 px-2.5 py-1 text-xs text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Undo Last Point
+        </button>
+
+        <button
+          type="button"
+          onClick={reverseRoute}
+          disabled={points.length < 2}
+          aria-label="Reverse the route waypoint order"
+          className="rounded-sm border border-zinc-700 px-2.5 py-1 text-xs text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Reverse Route
+        </button>
+
+        <button
+          type="button"
+          onClick={triggerFitRoute}
+          disabled={points.length < 2}
+          aria-label="Fit route in map view"
+          className="rounded-sm border border-zinc-700 px-2.5 py-1 text-xs text-zinc-400 transition-colors hover:border-zinc-500 hover:text-zinc-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-40"
+        >
+          Fit Route
         </button>
 
         <button

@@ -10,6 +10,7 @@ import MapViewport from "./MapViewport";
 import MapToolbar from "./MapToolbar";
 import MarkerDetailPanel from "./MarkerDetailPanel";
 import RoutePlannerBar from "./RoutePlannerBar";
+import RouteWaypointList from "./RouteWaypointList";
 
 interface InteractiveMapProps {
   mapSlug: string;
@@ -28,7 +29,8 @@ function InteractiveMapInner({ config, markers, categories }: InnerProps) {
     searchQuery,
     enabledCategories,
   } = useMapContext();
-  const { isActive: isRouteActive } = useRoutePlannerContext();
+  const { isActive: isRouteActive, points: routePoints } =
+    useRoutePlannerContext();
 
   const filteredMarkers = useFilteredMarkers(
     markers,
@@ -70,6 +72,7 @@ function InteractiveMapInner({ config, markers, categories }: InnerProps) {
           onClose={() => handleSelectMarker(null)}
         />
       )}
+      {routePoints.length > 0 && <RouteWaypointList />}
     </div>
   );
 }
