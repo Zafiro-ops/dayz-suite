@@ -2,7 +2,7 @@
 
 import L from "leaflet";
 import { Polyline, Marker } from "react-leaflet";
-import { normalizedToLeaflet } from "@/lib/map-engine/coordinates";
+import { normalizedToLeaflet, leafletToNormalized, clampNormalized } from "@/lib/map-engine/coordinates";
 import { useRoutePlannerContext } from "@/lib/map-engine/route-context";
 import type { MapBounds } from "@/types/map-engine";
 
@@ -25,7 +25,7 @@ function makeWaypointIcon(
   const half = size / 2;
   const fontSize = size <= 20 ? "9" : "10";
   return L.divIcon({
-    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2px solid #ffffff;display:flex;align-items:center;justify-content:center;font-size:${fontSize}px;font-weight:700;font-family:system-ui,sans-serif;color:#ffffff;box-sizing:border-box;">${num}</div>`,
+    html: `<div style="width:${size}px;height:${size}px;border-radius:50%;background:${color};border:2px solid #ffffff;display:flex;align-items:center;justify-content:center;font-size:${fontSize}px;font-weight:700;font-family:system-ui,sans-serif;color:#ffffff;box-sizing:border-box;cursor:grab;">${num}</div>`,
     className: "",
     iconSize: L.point(size, size),
     iconAnchor: L.point(half, half),
@@ -33,7 +33,7 @@ function makeWaypointIcon(
 }
 
 export default function RouteMapLayer({ bounds }: RouteMapLayerProps) {
-  const { points } = useRoutePlannerContext();
+  const { points, updatePointPosition } = useRoutePlannerContext();
 
   if (points.length === 0) return null;
 
@@ -67,8 +67,21 @@ export default function RouteMapLayer({ bounds }: RouteMapLayerProps) {
             key={point.id}
             position={normalizedToLeaflet(point.x, point.y, bounds)}
             icon={makeWaypointIcon(num, isStart, isEnd)}
+            draggable
             alt={label}
             title={label}
+            eventHandlers={{
+              dragend(e) {
+                const lm = e.target as L.Marker;
+                const { lat, lng } = lm.getLatLng();
+                const [nx, ny] = leafletToNormalized(lat, lng, bounds);
+                updatePointPosition(
+                  point.id,
+                  clampNormalized(nx),
+                  clampNormalized(ny),
+                );
+              },
+            }}
           />
         );
       })}

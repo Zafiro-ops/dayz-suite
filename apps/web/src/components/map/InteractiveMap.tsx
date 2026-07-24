@@ -11,6 +11,8 @@ import MapToolbar from "./MapToolbar";
 import MarkerDetailPanel from "./MarkerDetailPanel";
 import RoutePlannerBar from "./RoutePlannerBar";
 import RouteWaypointList from "./RouteWaypointList";
+import RouteFileActions from "./RouteFileActions";
+import RouteManagerPanel from "./RouteManagerPanel";
 
 interface InteractiveMapProps {
   mapSlug: string;
@@ -29,7 +31,7 @@ function InteractiveMapInner({ config, markers, categories }: InnerProps) {
     searchQuery,
     enabledCategories,
   } = useMapContext();
-  const { isActive: isRouteActive, points: routePoints } =
+  const { isActive: isRouteActive, points: routePoints, routes } =
     useRoutePlannerContext();
 
   const filteredMarkers = useFilteredMarkers(
@@ -73,6 +75,12 @@ function InteractiveMapInner({ config, markers, categories }: InnerProps) {
         />
       )}
       {routePoints.length > 0 && <RouteWaypointList />}
+      {(isRouteActive || routePoints.length > 0) && (
+        <RouteFileActions mapSlug={config.slug} />
+      )}
+      {(isRouteActive || routePoints.length > 0 || routes.length > 1) && (
+        <RouteManagerPanel />
+      )}
     </div>
   );
 }

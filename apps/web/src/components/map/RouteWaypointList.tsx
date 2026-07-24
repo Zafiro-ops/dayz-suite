@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useRef, useEffect } from "react";
 import { useRoutePlannerContext } from "@/lib/map-engine/route-context";
 import { calcSegmentDistance } from "@/lib/map-engine/route-utils";
 
@@ -8,7 +9,25 @@ const END_COLOR = "#ef4444";
 const MID_COLOR = "#f59e0b";
 
 export default function RouteWaypointList() {
-  const { points, removePoint } = useRoutePlannerContext();
+  const { points, removePoint, movePointUp, movePointDown } =
+    useRoutePlannerContext();
+
+  const [announcement, setAnnouncement] = useState("");
+  const clearRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear pending announcement timer on unmount
+  useEffect(
+    () => () => {
+      if (clearRef.current) clearTimeout(clearRef.current);
+    },
+    [],
+  );
+
+  function announce(msg: string) {
+    setAnnouncement(msg);
+    if (clearRef.current) clearTimeout(clearRef.current);
+    clearRef.current = setTimeout(() => setAnnouncement(""), 2000);
+  }
 
   if (points.length === 0) return null;
 
@@ -18,6 +37,11 @@ export default function RouteWaypointList() {
       aria-label="Route waypoints"
       className="mt-3 rounded-sm border border-zinc-800 bg-zinc-900"
     >
+      {/* Screen-reader live announcement */}
+      <div role="status" aria-live="polite" className="sr-only">
+        {announcement}
+      </div>
+
       {/* Header */}
       <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-2.5">
         <h3 className="text-xs font-medium text-zinc-400">
@@ -26,6 +50,9 @@ export default function RouteWaypointList() {
             ({points.length})
           </span>
         </h3>
+        <p className="text-[10px] text-zinc-600">
+          Drag map markers or use ▲ ▼ to reorder
+        </p>
       </div>
 
       {/* Scrollable list */}
@@ -41,12 +68,16 @@ export default function RouteWaypointList() {
           const segDist =
             i > 0 ? calcSegmentDistance(points[i - 1], point) : null;
 
-          const removeLabel = `Remove waypoint ${num}${isStart ? " — Start" : isEnd ? " — End" : ""}`;
+          const posLabel = isStart
+            ? ` — Start`
+            : isEnd
+              ? ` — End`
+              : "";
 
           return (
             <li
               key={point.id}
-              className="flex items-center gap-3 px-4 py-2.5"
+              className="flex items-center gap-2 px-4 py-2"
             >
               {/* Numbered badge */}
               <span
@@ -58,7 +89,7 @@ export default function RouteWaypointList() {
               </span>
 
               {/* Start / End text label — not communicated by color alone */}
-              {(isStart || isEnd) ? (
+              {isStart || isEnd ? (
                 <span
                   className="shrink-0 rounded-sm px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide"
                   style={{ color: dotColor, border: `1px solid ${dotColor}33` }}
@@ -75,16 +106,51 @@ export default function RouteWaypointList() {
               </span>
 
               {/* Segment distance (all but first) */}
-              <span className="shrink-0 text-[11px] text-zinc-600" aria-label={segDist !== null ? `${segDist.toFixed(1)} map units from previous` : ""}>
+              <span
+                className="w-14 shrink-0 text-right text-[11px] text-zinc-600"
+                aria-label={
+                  segDist !== null
+                    ? `${segDist.toFixed(1)} map units from previous`
+                    : ""
+                }
+              >
                 {segDist !== null ? `+${segDist.toFixed(1)}` : ""}
               </span>
 
-              {/* Remove button */}
+              {/* Move Up */}
+              <button
+                type="button"
+                onClick={() => {
+                  movePointUp(point.id);
+                  announce(`Waypoint ${num}${posLabel} moved up.`);
+                }}
+                disabled={i === 0}
+                aria-label={`Move waypoint ${num}${posLabel} up`}
+                className="shrink-0 rounded-sm border border-zinc-700 px-1.5 py-0.5 text-[11px] text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                ▲
+              </button>
+
+              {/* Move Down */}
+              <button
+                type="button"
+                onClick={() => {
+                  movePointDown(point.id);
+                  announce(`Waypoint ${num}${posLabel} moved down.`);
+                }}
+                disabled={i === points.length - 1}
+                aria-label={`Move waypoint ${num}${posLabel} down`}
+                className="shrink-0 rounded-sm border border-zinc-700 px-1.5 py-0.5 text-[11px] text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 disabled:cursor-not-allowed disabled:opacity-30"
+              >
+                ▼
+              </button>
+
+              {/* Remove */}
               <button
                 type="button"
                 onClick={() => removePoint(point.id)}
-                aria-label={removeLabel}
-                className="shrink-0 rounded-sm border border-zinc-700 px-2 py-0.5 text-[11px] text-zinc-500 transition-colors hover:border-zinc-500 hover:text-zinc-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
+                aria-label={`Remove waypoint ${num}${posLabel}`}
+                className="shrink-0 rounded-sm border border-zinc-700 px-2 py-0.5 text-[11px] text-zinc-500 transition-colors hover:border-red-800 hover:text-red-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500"
               >
                 Remove
               </button>
